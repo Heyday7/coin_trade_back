@@ -1,0 +1,63 @@
+version: '3'
+
+volumes:
+  coin_postgres_db : {}
+
+services:
+  db:
+    image: postgres
+    volumes:
+      - coin_postgres_db:/var/lib/postgresql/data
+    environment: 
+      - POSTGRES_DB=coin_postgres
+      - POSTGRES_USER=coin_postgres
+      - POSTGRES_PASSWORD=coin_postgres
+      - POSTGRES_INITDB_ARGS=--encoding=UTF-8
+
+  backend:
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    stdin_open: true
+    tty: true
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./back:/app/
+    command:
+      - bash
+      - -c
+      - |
+        chmod +x /wait-for-it.sh
+        /wait-for-it.sh db:5432 -t 10
+        python manage.py runserver 0:8000
+    depends_on: 
+      - db
+      - redis
+
+  redis:
+    image: redis
+    ports:
+      - "6379:6379"
+
+  celery:
+    build: 
+      context: .
+    command: celery -A back worker -l info
+    volumes:
+      - ./back:/app/
+    depends_on: 
+      - db
+      - redis
+      - backend
+
+  celery-beat:
+    build:
+      context: .
+    command: celery -A back beat -l info
+    volumes:
+      - ./back:/app/
+    depends_on:
+      - db
+      - redis
+      - backend
