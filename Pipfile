@@ -9,6 +9,10 @@ djangorestframework = "*"
 django-cors-headers = "*"
 pytest-django = "*"
 ipdb = "*"
+psycopg2-binary = "*"
+celery = {extras = ["redis"], version = "*"}
+redis = "*"
+requests = "*"
 
 [dev-packages]
 
