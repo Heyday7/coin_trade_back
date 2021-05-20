@@ -61,7 +61,6 @@ class AccountSerializer(serializers.Serializer):
 		return data
 
 	def create(self, validated_data):
-
 		user_data = validated_data.pop('user')
 		user = UserSerializer.create(UserSerializer(), validated_data=user_data)
 		account = Account.objects.create(user=user)
