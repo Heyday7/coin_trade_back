@@ -53,7 +53,7 @@ class AccountSerializer(serializers.Serializer):
 
 	class Meta:
 		model = Account
-		fiels = ['user', 'balance']
+		fields = ['user', 'balance']
 
 	def validate(self, data):
 		user_data = data['user']
