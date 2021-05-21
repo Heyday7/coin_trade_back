@@ -1,9 +1,9 @@
 from django.shortcuts import render
 from rest_framework import generics, serializers
-from .models import Coin
-from .serializers import CoinSerializer
+from .models import Coin, CoinPrice
+from .serializers import CoinPriceSerializer
 
-class CoinView(generics.ListAPIView):
-    queryset = Coin.objects.all().order_by('-date')
-    serializer_class = CoinSerializer
+class CoinPriceView(generics.ListAPIView):
+    queryset = CoinPrice.objects.all().order_by('-date')
+    serializer_class = CoinPriceSerializer
 
