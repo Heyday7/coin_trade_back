@@ -18,10 +18,10 @@ def debug_task(self):
     print('Request: {0!r}'.format(self.request))
 
 
-app.conf.beat_schedule = {
-	'get_coin_data': {
-		'task': 'coin.tasks.get_coin_data',
-		'schedule': 2.0,
-    'kwargs' : {'coin':'BTC'}
-	}
-}
+# app.conf.beat_schedule = {
+# 	'get_coin_data': {
+# 		'task': 'coin.tasks.get_coin_data',
+# 		'schedule': 2.0,
+#     'kwargs' : {'ticker':'BTC'}
+# 	}
+# }
