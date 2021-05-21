@@ -3,5 +3,5 @@ from rest_framework import urlpatterns
 from .views import *
 
 urlpatterns = [
-  path('coin', CoinView.as_view(), name='coin'),
+    path('coin', CoinPriceView.as_view(), name='coin'),
 ]
