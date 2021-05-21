@@ -1,7 +1,10 @@
+from coin.models import CoinHolding
+from coin.serializers import CoinHoldingSerializer
 from rest_framework import serializers
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login
-from .models import Account
+from .models import Account, Transaction
+from django.shortcuts import get_object_or_404
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -41,19 +44,43 @@ class LoginSerializer(serializers.Serializer):
 			raise serializers.ValidationError("아이디 혹은 비밀번호가 잘못되었습니다")
 		return data
 
-	def perform_login(self, request):
+	def perform_login(self, request):				
 		user = authenticate(username=request.data['username'], password=request.data['password'])
 		login(request, user)
 		return user
 
 
-class AccountSerializer(serializers.Serializer):
+
+class TransactionSerializer(serializers.ModelSerializer):
+
+	class Meta:
+		model = Transaction
+		fields = ['id', 'account', 'type', 'coin', 'price', 'total_price', 'coin_amount']
+
+	def validate(self, data):
+		total_price = data['price'] * data['coin_amount']
+		if data['type'] == 'buy' and data['account'].balance < total_price:
+			raise serializers.ValidationError('보유 금액이 부족합니다')
+
+		data['total_price'] = total_price
+		
+		return data
+
+	def create(self, validated_data):
+		transaction = Transaction.objects.create(**validated_data)
+
+		return transaction
+
+
+class AccountSerializer(serializers.ModelSerializer):
 	user = UserSerializer(required=True)
-	balance = serializers.IntegerField()
+	balance = serializers.IntegerField(read_only=True)
+	transactions = TransactionSerializer(many=True, read_only=True)
+	coinholdings = CoinHoldingSerializer(many=True, read_only=True)
 
 	class Meta:
 		model = Account
-		fields = ['user', 'balance']
+		fields = ['user', 'balance', 'transactions', 'coinholdings']
 
 	def validate(self, data):
 		user_data = data['user']
