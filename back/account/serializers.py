@@ -58,11 +58,8 @@ class TransactionSerializer(serializers.ModelSerializer):
 		fields = ['id', 'account', 'type', 'coin', 'price', 'total_price', 'coin_amount']
 
 	def validate(self, data):
-		total_price = data['price'] * data['coin_amount']
-		if data['type'] == 'buy' and data['account'].balance < total_price:
+		if data['type'] == 'buy' and data['account'].balance < data['total_price']:
 			raise serializers.ValidationError('보유 금액이 부족합니다')
-
-		data['total_price'] = total_price
 		
 		return data
 
